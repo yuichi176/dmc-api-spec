@@ -1,0 +1,215 @@
+openapi: 3.1.0
+info:
+  title: 宿泊施設API
+  version: "0.1.0"
+paths:
+  /accommodations:
+    get:
+#      tags:
+#        - 宿泊施設
+      summary: 宿泊施設一覧取得
+      responses:
+        '200':
+          description: 宿泊施設一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: 施設ID
+                      example: 1
+                    name:
+                      type: string
+                      description: 施設名
+                      example: ホテルこうしゅうえん
+                    address:
+                      type: string
+                      description: 住所
+                      example: 輪島市塚田町３１−６
+                    area:
+                      $ref: '#/components/schemas/Area'
+                      description: エリア
+                      example: 輪島市
+                    phoneNumber:
+                      type: string
+                      description: 電話番号
+                      example: 0768-22-8888
+                    hasLargeBath:
+                      type: boolean
+                      description: 大浴場の有無
+                      example: true
+                    mealType:
+                      $ref: '#/components/schemas/MealType'
+                      description: 食事の有無
+                      example: 朝食・夕食あり
+                    notes:
+                      type: string
+                      description: 備考
+                      example: 古民家です。Wi-Fiあり。
+                    rooms:
+                      type: array
+                      description: 部屋一覧
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            description: 部屋ID
+                            example: 1
+                          name:
+                            type: string
+                            description: 部屋名
+                            example: 部屋A
+                          capacity:
+                            type: integer
+                            description: 収容人数
+                            example: 4
+                          sizeSquareMeters:
+                            type: integer
+                            description: 広さ（平米）
+                            example: 50
+                          notes:
+                            type: string
+                            description: 備考
+                            example: 現在風呂が使えません。
+  /accommodations/{id}:
+    get:
+#      tags:
+#        - 宿泊施設
+      summary: 宿泊施設1件取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 施設ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 指定されたIDの宿泊施設情報
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 施設ID
+                    example: 1
+                  name:
+                    type: string
+                    description: 施設名
+                    example: ホテルこうしゅうえん
+                  address:
+                    type: string
+                    description: 住所
+                    example: 輪島市塚田町３１−６
+                  area:
+                    $ref: '#/components/schemas/Area'
+                    description: エリア
+                    example: 輪島市
+                  phoneNumber:
+                    type: string
+                    description: 電話番号
+                    example: 0768-22-8888
+                  hasLargeBath:
+                    type: boolean
+                    description: 大浴場の有無
+                    example: true
+                  mealType:
+                    $ref: '#/components/schemas/MealType'
+                    description: 食事の有無
+                    example: 朝食・夕食あり
+                  notes:
+                    type: string
+                    description: 備考
+                    example: 古民家です。Wi-Fiあり。
+                  rooms:
+                    type: array
+                    description: 部屋一覧
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: 部屋ID
+                          example: 1
+                        name:
+                          type: string
+                          description: 部屋名
+                          example: 部屋A
+                        capacity:
+                          type: integer
+                          description: 収容人数
+                          example: 4
+                        size_sqm:
+                          type: integer
+                          description: 広さ（平米）
+                          example: 50
+                        notes:
+                          type: string
+                          description: 備考
+                          example: 現在風呂が使えません。
+
+  /accommodations/{id}/reservations:
+    get:
+#      tags:
+#        - 宿泊施設
+      summary: 部屋の予約状況取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 宿泊施設ID
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: true
+          description: 該当月（yyyy-MM形式）
+          schema:
+            type: string
+            example: '2024-09'
+      responses:
+        '200':
+          description: 部屋の予約状況
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    roomName:
+                      type: string
+                      description: 部屋名
+                      example: 部屋A
+                    availability:
+                      type: array
+                      description: 該当月全日の予約状況
+                      items:
+                        type: boolean
+                      example: [true, false, true, true, false, ...]
+
+components:
+  schemas:
+    Area:
+      type: string
+      enum:
+        - 輪島市
+        - 珠洲市
+        - 穴水町
+        - 能登町
+        - 七尾市
+        - 志賀町
+    MealType:
+      type: string
+      enum:
+        - 朝食・夕食あり
+        - 朝食のみ
+        - 夕食のみ
+        - なし
