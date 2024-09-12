@@ -143,37 +143,13 @@ paths:
                       type: string
                       description: 備考
                       example: 古民家です。Wi-Fiあり。
-                    rooms:
-                      type: array
-                      description: 部屋一覧
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            description: 部屋ID
-                            example: 1
-                          name:
-                            type: string
-                            description: 部屋名
-                            example: 部屋A
-                          capacity:
-                            type: integer
-                            description: 収容人数
-                            example: 4
-                          sizeSquareMeters:
-                            type: integer
-                            description: 広さ（平米）
-                            example: 50
-                          notes:
-                            type: string
-                            description: 備考
-                            example: 現在風呂が使えません。
+
   /accommodations/{id}:
     get:
       tags:
         - B案：一覧画面と詳細画面を分ける
       summary: 宿泊施設詳細取得
+      description: 現状ただの一件取得であるため、一覧APIにID検索用のパラメータを追加すればこのAPIは不要
       parameters:
         - name: id
           in: path
@@ -221,32 +197,6 @@ paths:
                     type: string
                     description: 備考
                     example: 古民家です。Wi-Fiあり。
-                  rooms:
-                    type: array
-                    description: 部屋一覧
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          description: 部屋ID
-                          example: 1
-                        name:
-                          type: string
-                          description: 部屋名
-                          example: 部屋A
-                        capacity:
-                          type: integer
-                          description: 収容人数
-                          example: 4
-                        size_sqm:
-                          type: integer
-                          description: 広さ（平米）
-                          example: 50
-                        notes:
-                          type: string
-                          description: 備考
-                          example: 現在風呂が使えません。
 
   /accommodations/{id}/rooms:
     get:
@@ -277,14 +227,26 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
+                      description: 部屋ID
+                      example: 1
                     name:
                       type: string
                       description: 部屋名
                       example: 部屋A
-                    month:
+                    capacity:
+                      type: integer
+                      description: 収容人数
+                      example: 4
+                    sizeSquareMeters:
+                      type: integer
+                      description: 広さ（平米）
+                      example: 50
+                    notes:
                       type: string
-                      description: 該当月
-                      example: '2024-09'
+                      description: 備考
+                      example: 現在風呂が使えません。
                     availabilities:
                       type: array
                       description: 該当月全日の空き状況
