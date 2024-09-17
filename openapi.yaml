@@ -3,25 +3,9 @@ info:
   title: 宿泊施設API
   version: "0.1.0"
 paths:
-  /accommodations_A:
+  /hotels:
     get:
-      tags:
-        - A案：一覧画面と詳細画面を分けない
-      summary: 宿泊施設一覧取得
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 宿泊施設ID
-          schema:
-            type: integer
-        - name: month
-          in: query
-          required: true
-          description: 該当月（yyyy-MM形式）
-          schema:
-            type: string
-            example: '2024-09'
+      summary: 宿泊施設一覧
       responses:
         '200':
           description: 宿泊施設一覧
@@ -52,10 +36,10 @@ paths:
                       type: string
                       description: 電話番号
                       example: 0768-22-8888
-                    hasLargeBath:
-                      type: boolean
+                    largeBathType:
+                      $ref: '#/components/schemas/LargeBathType'
                       description: 大浴場の有無
-                      example: true
+                      example: あり
                     mealType:
                       $ref: '#/components/schemas/MealType'
                       description: 食事の有無
@@ -82,177 +66,66 @@ paths:
                             type: integer
                             description: 収容人数
                             example: 4
-                          sizeSquareMeters:
-                            type: integer
-                            description: 広さ（平米）
-                            example: 50
+                          size:
+                            type: string
+                            description: 広さ
+                            example: "50"
+                          allowSingleUse:
+                            type: boolean
+                            description: 1人利用OKか
+                            example: true
+                          bathType:
+                            $ref: '#/components/schemas/LargeBathType'
+                            description: 風呂の有無
+                            example: 浴槽付き
                           notes:
                             type: string
                             description: 備考
                             example: 現在風呂が使えません。
-                          availabilities:
+                          availability:
                             type: array
-                            description: 該当月全日の空き状況
+                            description: 空き状況
                             items:
-                              $ref: '#/components/schemas/RoomAvailability'
-                            example: [ 予約可, 予約不可, 予約可, 予約可, 要確認, ... ]
-  /accommodations_B:
-    get:
-      tags:
-        - B案：一覧画面と詳細画面を分ける
-      summary: 宿泊施設一覧取得
-      responses:
-        '200':
-          description: 宿泊施設一覧
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      description: 施設ID
-                      example: 1
-                    name:
-                      type: string
-                      description: 施設名
-                      example: ホテルこうしゅうえん
-                    address:
-                      type: string
-                      description: 住所
-                      example: 輪島市塚田町３１−６
-                    area:
-                      $ref: '#/components/schemas/Area'
-                      description: エリア
-                      example: 輪島市
-                    phoneNumber:
-                      type: string
-                      description: 電話番号
-                      example: 0768-22-8888
-                    hasLargeBath:
-                      type: boolean
-                      description: 大浴場の有無
-                      example: true
-                    mealType:
-                      $ref: '#/components/schemas/MealType'
-                      description: 食事の有無
-                      example: 朝食・夕食あり
-                    notes:
-                      type: string
-                      description: 備考
-                      example: 古民家です。Wi-Fiあり。
-
-  /accommodations/{id}:
-    get:
-      tags:
-        - B案：一覧画面と詳細画面を分ける
-      summary: 宿泊施設詳細取得
-      description: 現状ただの一件取得であるため、一覧APIにID検索用のパラメータを追加すればこのAPIは不要
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                  description: 日付
+                                  example: 2024-09
+                                status:
+                                  type: array
+                                  description: 空き状況
+                                  items:
+                                    type: integer
+                                    enum: [0, 1, 2]
+                                    example: 1
+  /hotels/{hotelId}/rooms/{roomId}/availability:
+    put:
+      summary: 空き状況登録
       parameters:
-        - name: id
+        - name: hotelId
           in: path
-          required: true
-          description: 施設ID
+          description: ホテルID
           schema:
             type: integer
-      responses:
-        '200':
-          description: 指定されたIDの宿泊施設情報
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: 施設ID
-                    example: 1
-                  name:
-                    type: string
-                    description: 施設名
-                    example: ホテルこうしゅうえん
-                  address:
-                    type: string
-                    description: 住所
-                    example: 輪島市塚田町３１−６
-                  area:
-                    $ref: '#/components/schemas/Area'
-                    description: エリア
-                    example: 輪島市
-                  phoneNumber:
-                    type: string
-                    description: 電話番号
-                    example: 0768-22-8888
-                  hasLargeBath:
-                    type: boolean
-                    description: 大浴場の有無
-                    example: true
-                  mealType:
-                    $ref: '#/components/schemas/MealType'
-                    description: 食事の有無
-                    example: 朝食・夕食あり
-                  notes:
-                    type: string
-                    description: 備考
-                    example: 古民家です。Wi-Fiあり。
-
-  /accommodations/{id}/rooms:
-    get:
-      tags:
-        - B案：一覧画面と詳細画面を分ける
-      summary: 部屋情報取得
-      parameters:
-        - name: id
+        - name: roomId
           in: path
-          required: true
-          description: 宿泊施設ID
+          description: 部屋ID
           schema:
             type: integer
-        - name: month
-          in: query
-          required: true
-          description: 該当月（yyyy-MM形式）
-          schema:
-            type: string
-            example: '2024-09'
-      responses:
-        '200':
-          description: 部屋の予約状況
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      description: 部屋ID
-                      example: 1
-                    name:
-                      type: string
-                      description: 部屋名
-                      example: 部屋A
-                    capacity:
-                      type: integer
-                      description: 収容人数
-                      example: 4
-                    sizeSquareMeters:
-                      type: integer
-                      description: 広さ（平米）
-                      example: 50
-                    notes:
-                      type: string
-                      description: 備考
-                      example: 現在風呂が使えません。
-                    availabilities:
-                      type: array
-                      description: 該当月全日の空き状況
-                      items:
-                        $ref: '#/components/schemas/RoomAvailability'
-                      example: [予約可, 予約不可, 予約可, 予約可, 要確認, ...]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  example: "2024-09-01"
+                status:
+                  type: integer
+                  enum: [0, 1, 2]
+                  example: 1
 components:
   schemas:
     Area:
@@ -271,9 +144,15 @@ components:
         - 朝食のみ
         - 夕食のみ
         - なし
-    RoomAvailability:
+    LargeBathType:
       type: string
       enum:
-        - 予約可
-        - 予約不可
-        - 要確認
+        - あり
+        - なし
+        - 問い合わせ
+    BathType:
+      type: string
+      enum:
+        - 浴槽付き
+        - シャワーのみ
+        - なし
